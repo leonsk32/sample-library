@@ -23,6 +23,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <java.version>1.8</java.version>
+    <version.DbSetup>2.0.0</version.DbSetup>
   </properties>
 
   <dependencies>
@@ -62,6 +63,11 @@
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.ninja-squad</groupId>
+      <artifactId>DbSetup</artifactId>
+      <version>${version.DbSetup}</version>
     </dependency>
   </dependencies>
 

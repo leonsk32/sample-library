@@ -7,6 +7,8 @@ import static org.hamcrest.CoreMatchers.*;
 import java.net.URI;
 import java.util.Arrays;
 
+import javax.sql.DataSource;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,10 +20,31 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.example.library.presentation.controller.payload.BookInfoResponse;
+import com.ninja_squad.dbsetup.DbSetup;
+import com.ninja_squad.dbsetup.Operations;
+import com.ninja_squad.dbsetup.destination.DataSourceDestination;
+import com.ninja_squad.dbsetup.destination.Destination;
+import com.ninja_squad.dbsetup.operation.Operation;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class LibraryApplicationTests {
+  
+  private static final Operation RESET_TABLES = Operations.deleteAllFrom("borrowers", "books");
+  private static final Operation INSERT_BOOKS =
+          Operations.insertInto("books")
+                    .columns("title", "price", "stock")
+                    .values("Sample Book X", 1500, 5)
+                    .values("Sample Book Y", 2000, 10)
+                    .values("Sample Book Z", 10000, 1)
+                    .build();
+  private static final Operation INSERT_BORROWERS =
+          Operations.insertInto("borrowers")
+                    .columns("name", "book_id")
+                    .values("taro", 1)
+                    .values("taro", 2)
+                    .values("jiro", 2)
+                    .build();
   
   @LocalServerPort
   private int port;
@@ -29,8 +52,13 @@ public class LibraryApplicationTests {
   @Autowired
   private TestRestTemplate template;
   
-  @Before
-  public void setUp() {
+  @Autowired
+  DataSource dataSource;
+  
+  private void dbSetUp(Operation operation) {
+    Destination destination = new DataSourceDestination(dataSource);
+    DbSetup dbSetup = new DbSetup(destination, operation);
+    dbSetup.launch();
   }
 
   @Test
@@ -39,14 +67,16 @@ public class LibraryApplicationTests {
   
   @Test
   public void test_指定したIDの書籍情報を取得できる() throws Exception {
+    dbSetUp(Operations.sequenceOf(RESET_TABLES, INSERT_BOOKS, INSERT_BORROWERS));
+    
     BookInfoResponse expected = new BookInfoResponse(
-        5,
-        "Sample Book A",
-        1200,
-        3,
+        2,
+        "Sample Book Y",
+        2000,
+        10,
         Arrays.asList("taro", "jiro"));
 
-    URI uri = new URI("http://localhost:" + port + "/library/api/v1/book/1");
+    URI uri = new URI("http://localhost:" + port + "/library/api/v1/book/2");
 
     
     BookInfoResponse actual = template.getForObject(uri, BookInfoResponse.class);
