@@ -1,5 +1,6 @@
 package com.example.library.infrastructure.datasource.entity;
 
+import com.example.library.domain.model.Book;
 import java.util.List;
 
 import javax.persistence.CollectionTable;
@@ -45,5 +46,14 @@ public class BookEntity {
   @CollectionTable(name = "borrowers", joinColumns = @JoinColumn(name = "book_id"))
   @Column(name = "name")
   private List<String> borrowers;
+  
+  /**
+   * このクラスの情報を使用してドメインのクラスを作成します.
+   * 
+   * @return {@link Book} ドメインクラスのインスタンス
+   */
+  public Book createInstance() {
+    return new Book(id, title, price, stock, borrowers);
+  }
 
 }

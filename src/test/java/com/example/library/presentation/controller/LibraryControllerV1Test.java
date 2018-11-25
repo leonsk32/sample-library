@@ -5,7 +5,9 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -19,6 +21,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import com.example.library.application.service.LibraryService;
 import com.example.library.common.exception.BookNotFoundException;
 import com.example.library.domain.model.Book;
+import com.example.library.infrastructure.datasource.entity.BookEntity;
 import com.example.library.presentation.controller.payload.BookInfoResponse;
 import com.example.library.presentation.controller.payload.ErrorResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -55,7 +58,7 @@ public class LibraryControllerV1Test {
         3,
         Arrays.asList("taro", "jiro"));
     
-    mvc.perform(get("/api/v1/book/5").contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+    mvc.perform(get("/api/v1/books/5").contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
        .andExpect(status().isOk())
        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
        .andExpect(content().json(mapper.writeValueAsString(expected)));
@@ -67,8 +70,27 @@ public class LibraryControllerV1Test {
 
     ErrorResponse expected = new ErrorResponse("0001", "book not found.");
     
-    mvc.perform(get("/api/v1/book/3").contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+    mvc.perform(get("/api/v1/books/3").contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
        .andExpect(status().isNotFound())
+       .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+       .andExpect(content().json(mapper.writeValueAsString(expected)));
+  }
+  
+  @Test
+  public void test_getAllBooks_全書籍を取得できる() throws Exception {
+    List<Book> mockResponse = new ArrayList<>();
+    mockResponse.add(new Book(1, "Sample Book A", 1500, 3, Arrays.asList("taro", "jiro")));
+    mockResponse.add(new Book(2, "Sample Book B", 1600, 2, Arrays.asList("taro")));
+    mockResponse.add(new Book(3, "Sample Book C", 1700, 1, Arrays.asList()));
+    when(service.getAllBooks()).thenReturn(mockResponse);
+
+    List<BookInfoResponse> expected = new ArrayList<>();
+    expected.add(new BookInfoResponse(1, "Sample Book A", 1500, 3, Arrays.asList("taro", "jiro")));
+    expected.add(new BookInfoResponse(2, "Sample Book B", 1600, 2, Arrays.asList("taro")));
+    expected.add(new BookInfoResponse(3, "Sample Book C", 1700, 1, Arrays.asList()));
+    
+    mvc.perform(get("/api/v1/books").contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+       .andExpect(status().isOk())
        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
        .andExpect(content().json(mapper.writeValueAsString(expected)));
   }

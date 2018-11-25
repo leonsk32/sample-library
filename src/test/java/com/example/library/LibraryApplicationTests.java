@@ -76,7 +76,7 @@ public class LibraryApplicationTests {
         10,
         Arrays.asList("taro", "jiro"));
 
-    URI uri = new URI("http://localhost:" + port + "/library/api/v1/book/2");
+    URI uri = new URI("http://localhost:" + port + "/library/api/v1/books/2");
 
     
     BookInfoResponse actual = template.getForObject(uri, BookInfoResponse.class);
