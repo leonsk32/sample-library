@@ -23,4 +23,11 @@ public interface LibraryService {
    */
   public List<Book> getAllBooks();
   
+  /**
+   * 新しく初期情報を登録します.
+   * 
+   * @param book 登録する書籍インスタンス
+   * @return 登録書籍の ID
+   */
+  public Book createBook(Book book);
 }

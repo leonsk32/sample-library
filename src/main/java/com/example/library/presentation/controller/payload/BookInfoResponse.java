@@ -22,16 +22,15 @@ public class BookInfoResponse {
   private List<String> borrowers;
   
   /**
-   * {@link Book} ドメインモデルのインスタンスをもとに、ペイロードを作成します.
+   * コンストラクタ.
    * 
-   * @param book 書籍ドメインモデルのインスタンス
-   * @return 書籍情報を表すペイロード
+   * @param book {@link Book} ドメインクラスのインスタンス
    */
-  public static BookInfoResponse createInstance(Book book) {
-    return new BookInfoResponse(book.getId(),
-                                book.getTitle(),
-                                book.getPrice(),
-                                book.getStock(),
-                                book.getBorrowers());
+  public BookInfoResponse(Book book) {
+    this.bookId = book.getId();
+    this.title = book.getTitle();
+    this.price = book.getPrice();
+    this.stock = book.getStock();
+    this.borrowers = book.getBorrowers();
   }
 }

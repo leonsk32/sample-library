@@ -27,7 +27,7 @@ import com.example.library.infrastructure.datasource.repository.BookRepository;
 public class LibraryServiceImplTest {
   
   @InjectMocks
-  LibraryServiceImpl service;
+  LibraryServiceImpl testTarget;
   
   @Mock
   BookRepository repository;
@@ -47,7 +47,7 @@ public class LibraryServiceImplTest {
     when(repository.findById(5)).thenReturn(Optional.of(mockResponse));
     
     Book expected = new Book(5, "Sample Book A", 1500, 3, Arrays.asList("taro", "jiro"));
-    Book actual = service.findBookById(5);
+    Book actual = testTarget.findBookById(5);
     
     assertThat(actual, is(expected));
   }
@@ -57,7 +57,7 @@ public class LibraryServiceImplTest {
     when(repository.findById(3)).thenReturn(Optional.empty());
     
     exception.expect(BookNotFoundException.class);
-    service.findBookById(3);
+    testTarget.findBookById(3);
     
     fail("no exception.");
   }
@@ -75,7 +75,20 @@ public class LibraryServiceImplTest {
     expected.add(new Book(2, "Sample Book B", 1600, 2, Arrays.asList("taro")));
     expected.add(new Book(3, "Sample Book C", 1700, 1, Arrays.asList()));
     
-    List<Book> actual = service.getAllBooks();
+    List<Book> actual = testTarget.getAllBooks();
+    
+    assertThat(actual, is(expected));
+  }
+  
+  @Test
+  public void test_createBook_書籍を登録できる() {
+    when(repository.save(new BookEntity(0, "Sample Book C", 1700, 2, Arrays.asList())))
+      .thenReturn(new BookEntity(3, "Sample Book C", 1700, 2, Arrays.asList()));
+    
+    Book request = new Book(0, "Sample Book C", 1700, 2, Arrays.asList());
+    
+    Book expected = new Book(3, "Sample Book C", 1700, 2, Arrays.asList());
+    Book actual = testTarget.createBook(request);
     
     assertThat(actual, is(expected));
   }

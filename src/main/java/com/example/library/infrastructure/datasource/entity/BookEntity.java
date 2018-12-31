@@ -48,12 +48,24 @@ public class BookEntity {
   private List<String> borrowers;
   
   /**
+   * コンストラクタ.
+   * 
+   * @param book {@link Book} ドメインクラスのインスタンス
+   */
+  public BookEntity(Book book) {
+    this.id = book.getId();
+    this.title = book.getTitle();
+    this.price = book.getPrice();
+    this.stock = book.getStock();
+    this.borrowers = book.getBorrowers();
+  }
+  
+  /**
    * このクラスの情報を使用してドメインのクラスを作成します.
    * 
    * @return {@link Book} ドメインクラスのインスタンス
    */
-  public Book createInstance() {
+  public Book createBookInstance() {
     return new Book(id, title, price, stock, borrowers);
   }
-
 }

@@ -22,14 +22,16 @@ import com.example.library.application.service.LibraryService;
 import com.example.library.common.exception.BookNotFoundException;
 import com.example.library.domain.model.Book;
 import com.example.library.infrastructure.datasource.entity.BookEntity;
+import com.example.library.presentation.controller.payload.BookInfoRequest;
 import com.example.library.presentation.controller.payload.BookInfoResponse;
 import com.example.library.presentation.controller.payload.ErrorResponse;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class LibraryControllerV1Test {
 
   @InjectMocks
-  LibraryControllerV1 controller;
+  LibraryControllerV1 testTarget;
 
   @Mock
   LibraryService service;
@@ -40,7 +42,7 @@ public class LibraryControllerV1Test {
   @Before
   public void setUp() {
     MockitoAnnotations.initMocks(this);
-    mvc = MockMvcBuilders.standaloneSetup(controller)
+    mvc = MockMvcBuilders.standaloneSetup(testTarget)
                          .setControllerAdvice(LibraryExceptionHandler.class)
                          .build();
     mapper = new ObjectMapper();
@@ -95,4 +97,24 @@ public class LibraryControllerV1Test {
        .andExpect(content().json(mapper.writeValueAsString(expected)));
   }
 
+  @Test
+  public void test_createBook_書籍を登録できる() throws Exception {
+    when(service.createBook(new Book(0, "Sample Book D", 1800, 4, Arrays.asList())))
+      .thenReturn(new Book(4, "Sample Book D", 1800, 4, Arrays.asList()));
+    
+    BookInfoRequest request = new BookInfoRequest("Sample Book D", 1800, 4);
+    BookInfoResponse expected = new BookInfoResponse(4, "Sample Book D", 1800, 4, Arrays.asList());
+    
+    mvc.perform(post("/api/v1/books")
+                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                .content(mapper.writeValueAsString(request)))
+      .andExpect(status().isOk())
+      .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+      .andExpect(content().json(mapper.writeValueAsString(expected)));
+  }
+  
+  @Test
+  public void test_createBook_必須項目が不足しておりエラーレスポンスが返る() throws Exception {
+    fail("not implemented.");
+  }
 }

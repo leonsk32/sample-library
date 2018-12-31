@@ -32,7 +32,7 @@ public class LibraryServiceImpl implements LibraryService {
       throw new BookNotFoundException();
     }
     
-    return result.get().createInstance();
+    return result.get().createBookInstance();
   }
 
   /**
@@ -41,8 +41,17 @@ public class LibraryServiceImpl implements LibraryService {
   @Override
   public List<Book> getAllBooks() {
     return repository.findAll().stream()
-        .map(BookEntity::createInstance)
+        .map(BookEntity::createBookInstance)
         .collect(Collectors.toList());
+  }
+
+  /**
+   * {@inheritDoc}}
+   */
+  @Override
+  public Book createBook(Book book) {
+    BookEntity registered = repository.save(new BookEntity(book));
+    return registered.createBookInstance();
   }
 
 }

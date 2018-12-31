@@ -2,6 +2,7 @@ package com.example.library.presentation.controller;
 
 import com.example.library.application.service.LibraryService;
 import com.example.library.domain.model.Book;
+import com.example.library.presentation.controller.payload.BookInfoRequest;
 import com.example.library.presentation.controller.payload.BookInfoResponse;
 
 import java.util.List;
@@ -11,8 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -35,7 +38,7 @@ public class LibraryControllerV1 {
   @ResponseStatus(HttpStatus.OK)
   public BookInfoResponse findBookById(@PathVariable String id) {
     Book book = service.findBookById(Integer.parseInt(id));
-    return BookInfoResponse.createInstance(book);
+    return new BookInfoResponse(book);
   }
   
   /**
@@ -48,7 +51,19 @@ public class LibraryControllerV1 {
   @ResponseStatus(HttpStatus.OK)
   public List<BookInfoResponse> getAllBooks() {
     return service.getAllBooks().stream()
-                                .map(BookInfoResponse::createInstance)
+                                .map(BookInfoResponse::new)
                                 .collect(Collectors.toList());
+  }
+  
+  /**
+   * 書籍を登録します.
+   * 
+   * @return 全書籍情報
+   */
+  @RequestMapping(method = RequestMethod.POST,
+                  produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+  @ResponseStatus(HttpStatus.OK)
+  public BookInfoResponse createBook(@RequestBody BookInfoRequest request) {
+    return new BookInfoResponse(service.createBook(request.createBookInstance()));
   }
 }
